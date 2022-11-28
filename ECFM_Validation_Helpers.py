@@ -209,7 +209,7 @@ def model_validation(profile_type, actual_profile, actual_rad_pos, model_rad_pos
     plt.tick_params(axis='y', labelsize=tick_size)
     plt.plot(model_rad_pos, base_case, '-o', color='C01')
     plt.fill_between(model_rad_pos, velocity_profile.reshape(-1,) - errors, velocity_profile.reshape(-1,) + errors)
-    plt.legend(['CFD', 'NN'])
+    plt.legend(['CFD', 'DNN'])
     file_name = profile_type + '_Velocity_Results/' + profile_type + '_Validation_plot.pdf'
     plt.savefig(file_name, format='pdf', bbox_inches='tight')
     plt.show()
@@ -294,7 +294,7 @@ def model_validation_with_phase(profile_type, actual_profile, actual_rad_pos, mo
     plt.tick_params(axis='y', labelsize=tick_size)
     plt.plot(model_rad_pos * 100, base_case, '-o', color='C01')
     plt.fill_between(model_rad_pos * 100, velocity_profile.reshape(-1,) - errors, velocity_profile.reshape(-1,) + errors)
-    plt.legend(['CFD', 'NN'], fontsize=16)
+    plt.legend(['CFD', 'DNN'], fontsize=16)
     plt.tick_params(axis='x', labelsize=14)
     plt.tick_params(axis='y', labelsize=14)
     file_name = profile_type + '_Velocity_Results/' + profile_type + '_Validation_plot.pdf'

@@ -189,6 +189,38 @@ def generate_monotonic_data(A, size, min_vel, max_vel):
         bs[i] = b 
     return sensitivity, velocity_profile, phases, bs
 
+def generate_monotonic_limited_data(A, size, min_vel, max_vel, percent): 
+    ''' Generates a sample of sensitivity and velocity data using a random monotonically decreasing velocity profile 
+    
+    Each component of the velocity profile is set to a random value between min_vel and max_vel and 
+    v_i - 1 >= v_i 
+
+    Args:
+        A: the matrix generated from the COMSOL simulation, (M, N) 
+        size: the number of pairs of sensitivity, velocity vectors that you want to generate 
+        min_vel: the minimum fluid velocity that will be included in the sensitivity generation 
+        max_vel: the maximum fluid velocity that will be included in the sensitivity generation 
+    Returns: 
+        sensitivity: (size, M, 1) ndarray of sensitivity matricies. 
+        velocity_profile: (size, N, 1) ndarray of corrisponding velocty profiles.
+        phases: (size, M, 1) of phases of the values in b 
+        bs: (size, M, 1) ndarray of both the real and imginary components of the b vector 
+    ''' 
+    sensitivity = np.zeros((size, A.shape[0], 1))
+    velocity_profile = np.zeros((size, A.shape[1], 1))
+    phases = np.zeros((size, A.shape[0], 1))
+    bs = np.zeros((size, A.shape[0], 1), dtype=complex)
+    for i in range(size):
+        # creating the random v vector
+        velocity_profile[i][0] = rand.uniform(min_vel, max_vel)
+        for j in range(1, A.shape[1]): 
+            velocity_profile[i][j] = rand.uniform((1 - percent) * velocity_profile[i][j - 1], velocity_profile[i][j - 1])
+        b = np.matmul(A, velocity_profile[i])
+        phases[i] = np.angle(b)
+        sensitivity[i] = np.reshape(get_sensitivity(b), (A.shape[0], 1)) 
+        bs[i] = b 
+    return sensitivity, velocity_profile, phases, bs
+
 def generate_random_data(A, size, min_vel, max_vel): 
     ''' Generates a sample of sensitivity and velocity data using a random velocity profiles
     
@@ -217,6 +249,7 @@ def generate_random_data(A, size, min_vel, max_vel):
         sensitivity[i] = np.reshape(get_sensitivity(b), (A.shape[0], 1)) 
         bs[i] = b 
     return sensitivity, velocity_profile, phases, bs
+
 
 def get_with_phase_input(sensitivity, phase, sensitivity_scale_factor=None, phase_scale_factor=None): 
     ''' Puts phases and sensitivity into the expected input for the NN model and scales them as needed 
